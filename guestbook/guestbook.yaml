@@ -1,19 +1,23 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
-  name: guestbook
+  name: helm-nginx
+  namespace: argocd
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: guestbook
-  template:
-    metadata:
-      labels:
-        app: guestbook
-    spec:
-      containers:
-      - name: guestbook
-        image: nginx:latest
-        ports:
-        - containerPort: 80
+  project: default
+
+  source:
+    repoURL: https://github.com/prabhuvamsi98/git-practice.git
+    targetRevision: master
+    path: mychart
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: helm-demo
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
